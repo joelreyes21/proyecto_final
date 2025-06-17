@@ -26,7 +26,7 @@ class WelcomeScreen extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/bg.jpg'), // Imagen de fondo
+                image: AssetImage('assets/bg.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -44,7 +44,7 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
               const Text(
-                'DONDE CADA TAZA GUARDA UNA HISTORIA',
+                'DONDE CADA TAZA GUARDA\nUNA HISTORIA',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
               ),
@@ -70,7 +70,7 @@ class WelcomeScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (_) => const SignUpScreen()),
                 ),
-                child: const Text("Don’t have an account? Sign Up",
+                child: const Text("Don’t have an account? Sing Up",
                     style: TextStyle(color: Colors.redAccent)),
               ),
               const Spacer(),
@@ -131,10 +131,18 @@ class AuthForm extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SelectTableScreen()), // Corregido: lleva al selector de mesa
-              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ProductDetailScreen(
+                      nombre: 'Espresso macchiato',
+                      precio: '\$3.70',
+                      imagen: 'assets/espresso.png',
+                    ),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
@@ -157,101 +165,47 @@ class AuthForm extends StatelessWidget {
   }
 }
 
-class SelectTableScreen extends StatelessWidget {
-  const SelectTableScreen({super.key});
+class ProductDetailScreen extends StatelessWidget {
+  final String nombre;
+  final String precio;
+  final String imagen;
+
+  const ProductDetailScreen({
+    super.key,
+    required this.nombre,
+    required this.precio,
+    required this.imagen,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final List<int> mesas = List.generate(11, (index) => index + 1);
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Selecciona tu mesa'),
-        backgroundColor: Colors.brown[700],
+        title: Text(nombre),
+        backgroundColor: Colors.brown,
       ),
-      backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
+            Image.asset(imagen, height: 200),
+            const SizedBox(height: 20),
+            Text(
+              nombre,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
+            Text(
+              precio,
+              style: const TextStyle(fontSize: 20, color: Colors.grey),
+            ),
+            const SizedBox(height: 20),
             const Text(
-              '¿En qué mesa te encuentras?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'Una deliciosa bebida perfecta para cualquier ocasión. Disfrútala caliente o fría.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 3,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: mesas.map((numeroMesa) {
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown[200],
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(24),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => HomeScreen(numeroMesa: numeroMesa),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      '$numeroMesa',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const HomeScreen(numeroMesa: 0),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              ),
-              icon: const Icon(Icons.delivery_dining),
-              label: const Text(
-                'Quiero Delivery',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-            const SizedBox(height: 20),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  final int numeroMesa;
-  const HomeScreen({super.key, required this.numeroMesa});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(numeroMesa == 0 ? 'Delivery' : 'Mesa #$numeroMesa'),
-        backgroundColor: Colors.brown[700],
-      ),
-      body: const Center(
-        child: Text(
-          'Aquí va el contenido del Home',
-          style: TextStyle(fontSize: 18),
         ),
       ),
     );

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailsScreen extends StatelessWidget {
   final String nombre;
   final String precio;
   final String imagen;
+  final String descripcion;
 
-  const ProductDetailScreen({
+  const ProductDetailsScreen({
     super.key,
     required this.nombre,
     required this.precio,
     required this.imagen,
+    required this.descripcion,
   });
 
   @override
@@ -17,20 +19,14 @@ class ProductDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(nombre),
-        backgroundColor: Colors.brown[700],
+        backgroundColor: Colors.brown,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                imagen,
-                height: 220,
-                fit: BoxFit.cover,
-              ),
-            ),
+            Image.asset(imagen, height: 200),
             const SizedBox(height: 20),
             Text(
               nombre,
@@ -42,10 +38,10 @@ class ProductDetailScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 20, color: Colors.grey),
             ),
             const SizedBox(height: 20),
-            const Text(
-              "Esta bebida es perfecta para acompañar tus momentos favoritos. Elaborada con ingredientes de alta calidad, está pensada para darte una experiencia única.",
-              style: TextStyle(fontSize: 16),
+            Text(
+              descripcion,
               textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),

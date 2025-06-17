@@ -1,94 +1,176 @@
 import 'package:flutter/material.dart';
-import 'home.dart'; // ✅ Importamos home.dart para navegar
+import 'product_details.dart'; // Asegúrate que exista esta pantalla si estás usando detalles
 
-class SelectTableScreen extends StatelessWidget {
-  final bool isLogin; // ✅ Recibimos este valor desde login_signup.dart
+class HomeScreen extends StatelessWidget {
+  final bool isLogin;
+  final int mesa; // ✅ Recibimos número de mesa
 
-  const SelectTableScreen({super.key, required this.isLogin});
+  const HomeScreen({super.key, required this.isLogin, required this.mesa});
 
   @override
   Widget build(BuildContext context) {
-    final List<int> mesas = List.generate(11, (index) => index + 1); // Mesas 1 a 11
+    final List<Map<String, dynamic>> productos = [
+      {
+        'nombre': 'Espresso macchiato',
+        'precio': '\$3.70',
+        'imagen': 'assets/espresso.png',
+        'descripcion': 'Un espresso fuerte con una pequeña capa de leche espumada.',
+      },
+      {
+        'nombre': 'Té chai',
+        'precio': '\$6.50',
+        'imagen': 'assets/te.png',
+        'descripcion': 'Infusión especiada con leche, típica de la India.',
+      },
+      {
+        'nombre': 'Granita de café',
+        'precio': '\$4.90',
+        'imagen': 'assets/granita.png',
+        'descripcion': 'Bebida fría granulada perfecta para el calor.',
+      },
+    ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Selecciona tu mesa'),
-        backgroundColor: Colors.brown[700],
-      ),
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black),
+          onPressed: () {},
+        ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: Icon(Icons.shopping_cart, color: Colors.black),
+          ),
+        ],
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: ListView(
           children: [
-            const SizedBox(height: 10),
-            const Text(
-              '¿En qué mesa te encuentras?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            // ✅ Número de mesa elegante
+            Align(
+              alignment: Alignment.topRight,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.brown.shade200,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  mesa == 0 ? 'Delivery' : 'Mesa #$mesa',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
-
-            // Grid de mesas
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 3,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: mesas.map((numeroMesa) {
-                  return ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown[200],
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(24),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacement(
+            const Text(
+              "What's for a drink\ntoday?",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const TextField(
+                decoration: InputDecoration(
+                  icon: Icon(Icons.search),
+                  hintText: "Search drink...",
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                Text("Hot Drinks", style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                Text("Cold Drinks", style: TextStyle(color: Colors.grey)),
+                Text("Pastries", style: TextStyle(color: Colors.grey)),
+                Text("Sandwiches", style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 230,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: productos.length,
+                itemBuilder: (context, index) {
+                  final producto = productos[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => HomeScreen(
-                            isLogin: isLogin,
-                            mesa: numeroMesa, // ✅ enviamos la mesa seleccionada
+                          builder: (_) => ProductDetailsScreen(
+                            nombre: producto['nombre'],
+                            precio: producto['precio'],
+                            imagen: producto['imagen'],
+                            descripcion: producto['descripcion'],
                           ),
                         ),
                       );
                     },
-                    child: Text(
-                      '$numeroMesa',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    child: Container(
+                      width: 150,
+                      margin: const EdgeInsets.only(right: 16),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: Image.asset(
+                              producto['imagen'],
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Text(
+                            producto['nombre'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            producto['precio'],
+                            style: const TextStyle(color: Color.fromARGB(248, 0, 0, 0)),
+                          ),
+                        ],
+                      ),
                     ),
                   );
-                }).toList(),
+                },
               ),
             ),
-
-            const SizedBox(height: 10),
-
-            // Opción delivery
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HomeScreen(
-                      isLogin: isLogin,
-                      mesa: 0, // ✅ Delivery lo representamos como mesa 0
-                    ),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              ),
-              icon: const Icon(Icons.delivery_dining),
-              label: const Text(
-                'Quiero Delivery',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-            const SizedBox(height: 20),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+        currentIndex: 0,
+        onTap: (index) {},
       ),
     );
   }
