@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'product_details.dart';
 
 class HomeScreen extends StatelessWidget {
   final bool isLogin;
   final int mesa;
 
-  const HomeScreen({
-    super.key,
-    required this.isLogin,
-    required this.mesa,
-  });
+  const HomeScreen({super.key, required this.isLogin, required this.mesa});
 
   @override
   Widget build(BuildContext context) {
@@ -17,58 +14,63 @@ class HomeScreen extends StatelessWidget {
         'nombre': 'Expresso macchiato',
         'precio': '\$3.70',
         'imagen': 'assets/espresso.png',
-        'descripcion': 'Café intenso con un toque de leche espumada.',
+        'descripcion': 'Un espresso fuerte con un toque de leche espumada.',
       },
       {
         'nombre': 'Té chai',
         'precio': '\$6.20',
         'imagen': 'assets/te.png',
-        'descripcion': 'Té especiado con leche, al estilo hindú.',
+        'descripcion': 'Té con especias y leche, ideal para tardes frías.',
       },
       {
         'nombre': 'Té chai',
         'precio': '\$6.20',
         'imagen': 'assets/te.png',
-        'descripcion': 'Té especiado con leche, al estilo hindú.',
+        'descripcion': 'Té con especias y leche, ideal para tardes frías.',
       },
       {
         'nombre': 'Té chai',
         'precio': '\$6.20',
         'imagen': 'assets/te.png',
-        'descripcion': 'Té especiado con leche, al estilo hindú.',
+        'descripcion': 'Té con especias y leche, ideal para tardes frías.',
       },
     ];
-
-    final String mesaTexto = mesa == 0 ? 'Delivery 🛵' : 'Mesa #$mesa';
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Icon(Icons.menu, color: Colors.black),
-            Text(
-              mesaTexto,
-              style: const TextStyle(fontSize: 14, color: Colors.black54),
-            ),
-            const Icon(Icons.shopping_cart, color: Colors.black),
-          ],
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black),
+          onPressed: () {},
         ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: Icon(Icons.shopping_cart, color: Colors.black),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: ListView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               "What's for a drink\ntoday?",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 8),
+
+            Text(
+              mesa == 0 ? 'Modo: Delivery' : 'Mesa #$mesa',
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+
             const SizedBox(height: 20),
-            // Búsqueda
+
+            // Buscador
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               decoration: BoxDecoration(
@@ -84,71 +86,89 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            // Tabs
+
+            // Categorías
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: const [
-                Text("Hot Drinks", style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                Text(
+                  "Hot Drinks",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline),
+                ),
                 Text("Cold Drinks", style: TextStyle(color: Colors.grey)),
                 Text("Pastries", style: TextStyle(color: Colors.grey)),
                 Text("Sandwiches", style: TextStyle(color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 20),
-            // Productos
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: productos.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+
+            // Grid de productos
+            Expanded(
+              child: GridView.count(
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
-                mainAxisSpacing: 20,
+                mainAxisSpacing: 16,
                 childAspectRatio: 0.75,
-              ),
-              itemBuilder: (context, index) {
-                final producto = productos[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: Image.asset(
-                          producto['imagen'],
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
+                children: productos.map((producto) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ProductDetailsScreen(
+                            nombre: producto['nombre'],
+                            precio: producto['precio'],
+                            imagen: producto['imagen'],
+                            descripcion: producto['descripcion'],
+                          ),
                         ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        producto['nombre'],
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ClipOval(
+                            child: Image.asset(
+                              producto['imagen'],
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            producto['nombre'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            producto['precio'],
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        producto['precio'],
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
+        backgroundColor: Colors.white,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey,
+        currentIndex: 0,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
