@@ -7,15 +7,15 @@ class Carrito {
     _items.add(producto);
   }
 
-  static List<Producto> obtenerProductos() {
+  static List<Producto> obtenerTodos() {
     return _items;
-  }
-
-  static void eliminar(Producto producto) {
-    _items.remove(producto);
   }
 
   static void limpiar() {
     _items.clear();
+  }
+
+  static double total() {
+    return _items.fold(0.0, (sum, item) => sum + double.parse(item.precio.replaceAll('\$', '')));
   }
 }

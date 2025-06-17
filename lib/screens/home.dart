@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'product_details.dart';
+import 'cart_screen.dart'; // ✅ Import necesario para el carrito
 
 class HomeScreen extends StatelessWidget {
   final bool isLogin;
@@ -45,10 +46,15 @@ class HomeScreen extends StatelessWidget {
           icon: const Icon(Icons.menu, color: Colors.black),
           onPressed: () {},
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.shopping_cart, color: Colors.black),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartScreen()), // ✅ Navegación al carrito
+              );
+            },
           ),
         ],
       ),
@@ -62,15 +68,11 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-
             Text(
               mesa == 0 ? 'Modo: Delivery' : 'Mesa #$mesa',
               style: const TextStyle(color: Colors.grey, fontSize: 14),
             ),
-
             const SizedBox(height: 20),
-
-            // Buscador
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               decoration: BoxDecoration(
@@ -86,16 +88,15 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Categorías
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: const [
                 Text(
                   "Hot Drinks",
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline),
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
                 Text("Cold Drinks", style: TextStyle(color: Colors.grey)),
                 Text("Pastries", style: TextStyle(color: Colors.grey)),
@@ -103,8 +104,6 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Grid de productos
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
@@ -147,7 +146,9 @@ class HomeScreen extends StatelessWidget {
                             producto['nombre'],
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
