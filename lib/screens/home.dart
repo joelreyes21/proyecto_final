@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   final bool isLogin;
-  const HomeScreen({super.key, required this.isLogin});
+  final int mesa; // ✅ Se recibe la mesa seleccionada
+
+  const HomeScreen({super.key, required this.isLogin, required this.mesa}); // ✅ Constructor actualizado
 
   @override
   Widget build(BuildContext context) {
@@ -16,16 +18,6 @@ class HomeScreen extends StatelessWidget {
         'nombre': 'Té chai',
         'precio': '\$6.20',
         'imagen': 'assets/te.png',
-      },
-      {
-        'nombre': 'Té chai',
-        'precio': '\$6.20',
-        'imagen': 'assets/te.png',
-      },
-      {
-        'nombre': 'Expresso macchiato',
-        'precio': '\$3.70',
-        'imagen': 'assets/espresso.png',
       },
       {
         'nombre': 'Té chai',
@@ -56,14 +48,40 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20), // corregido
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: ListView(
           children: [
+            // ✅ MOSTRAR NÚMERO DE MESA
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 14),
+                decoration: BoxDecoration(
+                  color: Colors.brown[100],
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.event_seat, size: 18, color: Colors.brown),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Mesa #$mesa',
+                      style: const TextStyle(
+                        color: Colors.brown,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const Text(
               "What's for a drink\ntoday?",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
+
             // Campo de búsqueda
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -74,20 +92,24 @@ class HomeScreen extends StatelessWidget {
               child: const TextField(
                 decoration: InputDecoration(
                   icon: Icon(Icons.search),
-                  hintText: "Sear_ch", // corregido (opcional poner real "Search...")
+                  hintText: "Sear_ch",
                   border: InputBorder.none,
                 ),
               ),
             ),
             const SizedBox(height: 20),
+
             // Tabs horizontales
-            SingleChildScrollView( // corregido
-              scrollDirection: Axis.horizontal, // corregido
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: Row(
                 children: const [
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text("Hot Drinks", style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                    child: Text("Hot Drinks",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline)),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
@@ -105,57 +127,58 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            // Grid de productos (2 columnas) // corregido
-            GridView.count(
-  crossAxisCount: 2,
-  crossAxisSpacing: 16,
-  mainAxisSpacing: 16,
-  childAspectRatio: 0.75, 
-  shrinkWrap: true,
-  physics: const NeverScrollableScrollPhysics(),
-  children: productos.map((producto) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min, 
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ClipOval(
-            child: Image.asset(
-              producto['imagen'],
-              width: 90,
-              height: 90,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            producto['nombre'],
-            textAlign: TextAlign.center,
-            maxLines: 1, 
-            overflow: TextOverflow.ellipsis, // 
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            producto['precio'],
-            style: const TextStyle(fontSize: 15),
-          ),
-        ],
-      ),
-    );
-  }).toList(),
-),
 
+            // GRID DE PRODUCTOS (2 COLUMNAS)
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.75,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: productos.map((producto) {
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ClipOval(
+                        child: Image.asset(
+                          producto['imagen'],
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        producto['nombre'],
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        producto['precio'],
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
             const SizedBox(height: 20),
           ],
         ),
       ),
-      // Barra inferior
+
+      // BOTTOM NAVIGATION
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: Colors.black,

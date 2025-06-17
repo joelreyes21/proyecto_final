@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
+import 'select_table.dart'; // ✅ Corregido: vamos a select_table.dart, no directo al home
+
 class LoginSignUpScreen extends StatefulWidget {
   const LoginSignUpScreen({super.key});
 
@@ -110,14 +111,14 @@ class _LoginSignUpScreenState extends State<LoginSignUpScreen> {
                             ),
                           ),
                           onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => HomeScreen(isLogin: isLogin), // ✅ lo llevás al home y pasás el valor
-                            ),
-                          );
-                        },
-
+                            // ✅ Ir a selección de mesa después de login
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SelectTableScreen(isLogin: isLogin),
+                              ),
+                            );
+                          },
                           child: Text(isLogin ? 'Login' : 'Register'),
                         ),
                         const SizedBox(height: 20),
