@@ -1,196 +1,258 @@
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
-  final bool isLogin;
-  final int mesa; // ✅ Se recibe la mesa seleccionada
+void main() => runApp(const EntreTazasApp());
 
-  const HomeScreen({super.key, required this.isLogin, required this.mesa}); // ✅ Constructor actualizado
+class EntreTazasApp extends StatelessWidget {
+  const EntreTazasApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> productos = [
-      {
-        'nombre': 'Expresso macchiato',
-        'precio': '\$3.70',
-        'imagen': 'assets/espresso.png',
-      },
-      {
-        'nombre': 'Té chai',
-        'precio': '\$6.20',
-        'imagen': 'assets/te.png',
-      },
-      {
-        'nombre': 'Té chai',
-        'precio': '\$6.20',
-        'imagen': 'assets/te.png',
-      },
-      {
-        'nombre': 'Expresso macchiato',
-        'precio': '\$3.70',
-        'imagen': 'assets/espresso.png',
-      },
-    ];
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const WelcomeScreen(),
+    );
+  }
+}
 
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.shopping_cart, color: Colors.black),
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/bg.jpg'), // Imagen de fondo
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Spacer(),
+              const Text(
+                'ENTRE TAZAS',
+                style: TextStyle(
+                  fontSize: 30,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Text(
+                'DONDE CADA TAZA GUARDA UNA HISTORIA',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                ),
+                child: const Text('Log in'),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                ),
+                child: const Text("Don’t have an account? Sign Up",
+                    style: TextStyle(color: Colors.redAccent)),
+              ),
+              const Spacer(),
+            ],
+          )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: ListView(
+    );
+  }
+}
+
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const AuthForm(isLogin: true);
+  }
+}
+
+class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const AuthForm(isLogin: false);
+  }
+}
+
+class AuthForm extends StatelessWidget {
+  final bool isLogin;
+  const AuthForm({super.key, required this.isLogin});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ✅ MOSTRAR NÚMERO DE MESA
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 14),
-                decoration: BoxDecoration(
-                  color: Colors.brown[100],
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.event_seat, size: 18, color: Colors.brown),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Mesa #$mesa',
-                      style: const TextStyle(
-                        color: Colors.brown,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+            const Text("Welcome to Fast Food",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: TextField(
+                decoration: InputDecoration(hintText: "E-mail"),
               ),
             ),
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: TextField(
+                obscureText: true,
+                decoration: InputDecoration(hintText: "Password"),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SelectTableScreen()), // Corregido: lleva al selector de mesa
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(isLogin ? "Login" : "Register"),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Forgot Password?",
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SelectTableScreen extends StatelessWidget {
+  const SelectTableScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<int> mesas = List.generate(11, (index) => index + 1);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Selecciona tu mesa'),
+        backgroundColor: Colors.brown[700],
+      ),
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
             const Text(
-              "What's for a drink\ntoday?",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              '¿En qué mesa te encuentras?',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-
-            // Campo de búsqueda
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  icon: Icon(Icons.search),
-                  hintText: "Sear_ch",
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Tabs horizontales
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text("Hot Drinks",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline)),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text("Cold Drinks", style: TextStyle(color: Colors.grey)),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text("Pastries", style: TextStyle(color: Colors.grey)),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text("Sandwiches", style: TextStyle(color: Colors.grey)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // GRID DE PRODUCTOS (2 COLUMNAS)
-            GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.75,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: productos.map((producto) {
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ClipOval(
-                        child: Image.asset(
-                          producto['imagen'],
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 3,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: mesas.map((numeroMesa) {
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.brown[200],
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(24),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => HomeScreen(numeroMesa: numeroMesa),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        producto['nombre'],
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        producto['precio'],
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ],
+                      );
+                    },
+                    child: Text(
+                      '$numeroMesa',
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const HomeScreen(numeroMesa: 0),
                   ),
                 );
-              }).toList(),
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              ),
+              icon: const Icon(Icons.delivery_dining),
+              label: const Text(
+                'Quiero Delivery',
+                style: TextStyle(fontSize: 16),
+              ),
             ),
             const SizedBox(height: 20),
           ],
         ),
       ),
+    );
+  }
+}
 
-      // BOTTOM NAVIGATION
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-        currentIndex: 0,
-        onTap: (index) {
-          // acción futura
-        },
+class HomeScreen extends StatelessWidget {
+  final int numeroMesa;
+  const HomeScreen({super.key, required this.numeroMesa});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(numeroMesa == 0 ? 'Delivery' : 'Mesa #$numeroMesa'),
+        backgroundColor: Colors.brown[700],
+      ),
+      body: const Center(
+        child: Text(
+          'Aquí va el contenido del Home',
+          style: TextStyle(fontSize: 18),
+        ),
       ),
     );
   }
