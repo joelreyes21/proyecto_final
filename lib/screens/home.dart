@@ -110,7 +110,7 @@ class HomeScreen extends StatelessWidget {
   crossAxisCount: 2,
   crossAxisSpacing: 16,
   mainAxisSpacing: 16,
-  childAspectRatio: 0.75, // ✅ corregido: da más alto a cada card
+  childAspectRatio: 0.75, 
   shrinkWrap: true,
   physics: const NeverScrollableScrollPhysics(),
   children: productos.map((producto) {
@@ -121,7 +121,7 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(25),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // ✅ corregido
+        mainAxisSize: MainAxisSize.min, 
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ClipOval(
@@ -136,8 +136,8 @@ class HomeScreen extends StatelessWidget {
           Text(
             producto['nombre'],
             textAlign: TextAlign.center,
-            maxLines: 1, // ✅ corregido: evita texto muy largo
-            overflow: TextOverflow.ellipsis, // ✅ agregamos puntos suspensivos
+            maxLines: 1, 
+            overflow: TextOverflow.ellipsis, // 
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 5),
