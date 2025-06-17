@@ -13,7 +13,7 @@ class SelectTableScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Selecciona tu mesa'),
-        backgroundColor: Colors.brown[700],
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       ),
       backgroundColor: Colors.white,
       body: Padding(

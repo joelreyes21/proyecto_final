@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import '../utils/carrito.dart';
 import '../models/producto.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
   @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  @override
   Widget build(BuildContext context) {
-    final productos = Carrito.obtenerTodos(); // ✅ Corregido
+    final productos = Carrito.obtenerTodos();
 
     return Scaffold(
       appBar: AppBar(
@@ -24,6 +29,17 @@ class CartScreen extends StatelessWidget {
                   leading: Image.asset(producto.imagen, width: 50, height: 50),
                   title: Text(producto.nombre),
                   subtitle: Text(producto.precio),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      setState(() {
+                        Carrito.eliminar(producto);
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("${producto.nombre} eliminado")),
+                      );
+                    },
+                  ),
                 );
               },
             ),
@@ -33,7 +49,7 @@ class CartScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Acción futura: pagar, enviar orden, etc.
+                  // Acción futura: pagar
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,

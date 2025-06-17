@@ -1,41 +1,54 @@
 import 'package:flutter/material.dart';
 import 'product_details.dart';
-import 'cart_screen.dart'; // ✅ Import necesario para el carrito
+import 'cart_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final bool isLogin;
   final int mesa;
 
   const HomeScreen({super.key, required this.isLogin, required this.mesa});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String selectedCategory = 'Hot Drinks';
+  String searchTerm = '';
+
+  final List<Map<String, dynamic>> productos = [
+    {
+      'nombre': 'Expresso macchiato',
+      'precio': '\$3.70',
+      'imagen': 'assets/espresso.png',
+      'descripcion': 'Un espresso fuerte con un toque de leche espumada.',
+      'categoria': 'Hot Drinks',
+    },
+    {
+      'nombre': 'Té chai',
+      'precio': '\$6.20',
+      'imagen': 'assets/te.png',
+      'descripcion': 'Té con especias y leche, ideal para tardes frías.',
+      'categoria': 'Hot Drinks',
+    },
+    {
+      'nombre': 'Granita de café',
+      'precio': '\$4.50',
+      'imagen': 'assets/granita.png',
+      'descripcion': 'Café helado con textura granulada, refrescante.',
+      'categoria': 'Cold Drinks',
+    },
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> productos = [
-      {
-        'nombre': 'Expresso macchiato',
-        'precio': '\$3.70',
-        'imagen': 'assets/espresso.png',
-        'descripcion': 'Un espresso fuerte con un toque de leche espumada.',
-      },
-      {
-        'nombre': 'Té chai',
-        'precio': '\$6.20',
-        'imagen': 'assets/te.png',
-        'descripcion': 'Té con especias y leche, ideal para tardes frías.',
-      },
-      {
-        'nombre': 'Té chai',
-        'precio': '\$6.20',
-        'imagen': 'assets/te.png',
-        'descripcion': 'Té con especias y leche, ideal para tardes frías.',
-      },
-      {
-        'nombre': 'Té chai',
-        'precio': '\$6.20',
-        'imagen': 'assets/te.png',
-        'descripcion': 'Té con especias y leche, ideal para tardes frías.',
-      },
-    ];
+    final productosFiltrados = productos
+        .where((producto) =>
+            producto['categoria'] == selectedCategory &&
+            producto['nombre']
+                .toLowerCase()
+                .contains(searchTerm.toLowerCase()))
+        .toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -52,7 +65,7 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const CartScreen()), // ✅ Navegación al carrito
+                MaterialPageRoute(builder: (_) => const CartScreen()),
               );
             },
           ),
@@ -69,98 +82,109 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              mesa == 0 ? 'Modo: Delivery' : 'Mesa #$mesa',
+              widget.mesa == 0 ? 'Modo: Delivery' : 'Mesa #${widget.mesa}',
               style: const TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 20),
+            // 🔍 Buscador
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                onChanged: (value) => setState(() => searchTerm = value),
+                decoration: const InputDecoration(
                   icon: Icon(Icons.search),
-                  hintText: "Sear_ch",
+                  hintText: "Search...",
                   border: InputBorder.none,
                 ),
               ),
             ),
             const SizedBox(height: 20),
+            // 🔘 Categorías
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                Text(
-                  "Hot Drinks",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
+              children: ['Hot Drinks', 'Cold Drinks', 'Pastries', 'Sandwiches']
+                  .map((cat) {
+                final selected = cat == selectedCategory;
+                return GestureDetector(
+                  onTap: () => setState(() => selectedCategory = cat),
+                  child: Text(
+                    cat,
+                    style: TextStyle(
+                      fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                      color: selected ? Colors.black : Colors.grey,
+                      decoration: selected
+                          ? TextDecoration.underline
+                          : TextDecoration.none,
+                    ),
                   ),
-                ),
-                Text("Cold Drinks", style: TextStyle(color: Colors.grey)),
-                Text("Pastries", style: TextStyle(color: Colors.grey)),
-                Text("Sandwiches", style: TextStyle(color: Colors.grey)),
-              ],
+                );
+              }).toList(),
             ),
             const SizedBox(height: 20),
+            // 🛍️ Productos
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.75,
-                children: productos.map((producto) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ProductDetailsScreen(
-                            nombre: producto['nombre'],
-                            precio: producto['precio'],
-                            imagen: producto['imagen'],
-                            descripcion: producto['descripcion'],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipOval(
-                            child: Image.asset(
-                              producto['imagen'],
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
+              child: productosFiltrados.isEmpty
+                  ? const Center(child: Text("No hay productos"))
+                  : GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.75,
+                      children: productosFiltrados.map((producto) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProductDetailsScreen(
+                                  nombre: producto['nombre'],
+                                  precio: producto['precio'],
+                                  imagen: producto['imagen'],
+                                  descripcion: producto['descripcion'],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ClipOval(
+                                  child: Image.asset(
+                                    producto['imagen'],
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  producto['nombre'],
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  producto['precio'],
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            producto['nombre'],
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            producto['precio'],
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
+                        );
+                      }).toList(),
                     ),
-                  );
-                }).toList(),
-              ),
             ),
           ],
         ),
