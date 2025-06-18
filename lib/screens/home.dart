@@ -38,6 +38,41 @@ class _HomeScreenState extends State<HomeScreen> {
       'descripcion': 'Café helado con textura granulada, refrescante.',
       'categoria': 'Cold Drinks',
     },
+    {
+      'nombre': 'Tiramisu',
+      'precio': '\$4.50',
+      'imagen': 'assets/tiramisu.png',
+      'descripcion': 'Postre italiano con café y mascarpone.',
+      'categoria': 'Pastries',
+    },
+    {
+      'nombre': 'Sandwich',
+      'precio': '\$4.50',
+      'imagen': 'assets/sandwich.png',
+      'descripcion': 'Sándwich clásico con ingredientes frescos.',
+      'categoria': 'Sandwiches',
+    },
+    {
+      'nombre': 'Sandwich de queso',
+      'precio': '\$4.50',
+      'imagen': 'assets/sandwich_cheese.png',
+      'descripcion': 'Sándwich relleno de queso derretido.',
+      'categoria': 'Sandwiches',
+    },
+    {
+      'nombre': 'Chocolate lasagna',
+      'precio': '\$4.50',
+      'imagen': 'assets/chocolate_lasagna.png',
+      'descripcion': 'Postre de chocolate en capas tipo lasagna.',
+      'categoria': 'Pastries',
+    },
+    {
+      'nombre': 'Strawberry shortcake',
+      'precio': '\$4.50',
+      'imagen': 'assets/strawberryshortcake.png',
+      'descripcion': 'Pastel suave con crema y fresas frescas.',
+      'categoria': 'Pastries',
+    },
   ];
 
   @override
@@ -86,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: const TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 20),
+
             // 🔍 Buscador
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -103,7 +139,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // 🔘 Categorías
+
+            // 🏷️ Categorías
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: ['Hot Drinks', 'Cold Drinks', 'Pastries', 'Sandwiches']
@@ -125,6 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }).toList(),
             ),
             const SizedBox(height: 20),
+
             // 🛍️ Productos
             Expanded(
               child: productosFiltrados.isEmpty
@@ -157,11 +195,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                ClipOval(
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
                                   child: Image.asset(
                                     producto['imagen'],
-                                    width: 100,
-                                    height: 100,
+                                    width: 150,
+                                    height: 150,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -189,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: Colors.black,

@@ -57,6 +57,11 @@ flutter:
     - assets/espresso.png
     - assets/te.png
     - assets/granita.png
+    - assets/sandwich.png
+    - assets/sandwich_cheese.png
+    - assets/tiramisu.png
+    - assets/strawberryshortcake.png
+    - assets/chocolate_lasagna.png
 
 
   # The following line ensures that the Material Icons font is
