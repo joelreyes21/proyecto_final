@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'product_details.dart';
 import 'cart_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isLogin;
@@ -13,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String selectedCategory = 'Hot Drinks';
+  String selectedCategory = 'All';
   String searchTerm = '';
 
   final List<Map<String, dynamic>> productos = [
@@ -79,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final productosFiltrados = productos
         .where((producto) =>
-            producto['categoria'] == selectedCategory &&
+            (selectedCategory == 'All' || producto['categoria'] == selectedCategory) &&
             producto['nombre']
                 .toLowerCase()
                 .contains(searchTerm.toLowerCase()))
@@ -87,21 +88,68 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.brown),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  CircleAvatar(radius: 30, backgroundColor: Colors.white),
+                  SizedBox(height: 10),
+                  Text('Bienvenido', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Perfil'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: const Text('Historial de pedidos'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.receipt_long),
+              title: const Text('Facturas'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.payment),
+              title: const Text('Métodos de pago'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.star),
+              title: const Text('Favoritos'),
+              onTap: () {},
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
-        ),
+        iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart, color: Colors.black),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CartScreen()),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
             },
           ),
         ],
@@ -111,24 +159,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "What's for a drink\ntoday?",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+            const Text("What's for a drink\ntoday?", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(
-              widget.mesa == 0 ? 'Modo: Delivery' : 'Mesa #${widget.mesa}',
-              style: const TextStyle(color: Colors.grey, fontSize: 14),
-            ),
+            Text(widget.mesa == 0 ? 'Modo: Delivery' : 'Table #${widget.mesa}', style: const TextStyle(color: Colors.grey, fontSize: 14)),
             const SizedBox(height: 20),
-
-            // 🔍 Buscador
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(30),
-              ),
+              decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(30)),
               child: TextField(
                 onChanged: (value) => setState(() => searchTerm = value),
                 decoration: const InputDecoration(
@@ -139,12 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // 🏷️ Categorías
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: ['Hot Drinks', 'Cold Drinks', 'Pastries', 'Sandwiches']
-                  .map((cat) {
+              children: ['All', 'Hot Drinks', 'Cold Drinks', 'Pastries', 'Sandwiches'].map((cat) {
                 final selected = cat == selectedCategory;
                 return GestureDetector(
                   onTap: () => setState(() => selectedCategory = cat),
@@ -153,17 +187,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                       color: selected ? Colors.black : Colors.grey,
-                      decoration: selected
-                          ? TextDecoration.underline
-                          : TextDecoration.none,
+                      decoration: selected ? TextDecoration.underline : TextDecoration.none,
                     ),
                   ),
                 );
               }).toList(),
             ),
             const SizedBox(height: 20),
-
-            // 🛍️ Productos
             Expanded(
               child: productosFiltrados.isEmpty
                   ? const Center(child: Text("No hay productos"))
@@ -188,10 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                           child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(20)),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -205,19 +232,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                Text(
-                                  producto['nombre'],
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
+                                Text(producto['nombre'], textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                 const SizedBox(height: 4),
-                                Text(
-                                  producto['precio'],
-                                  style: const TextStyle(fontSize: 14),
-                                ),
+                                Text(producto['precio'], style: const TextStyle(fontSize: 14)),
                               ],
                             ),
                           ),
@@ -228,15 +245,20 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey,
         currentIndex: 0,
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.add_business), label: 'Staff'),
         ],
       ),
     );
