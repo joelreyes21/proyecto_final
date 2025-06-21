@@ -22,7 +22,9 @@ class ProductDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Detalles del producto"),
         centerTitle: true,
-        backgroundColor: Colors.brown[700],
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+        foregroundColor: Colors.white,
+
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart),
@@ -67,13 +69,14 @@ class ProductDetailsScreen extends StatelessWidget {
                 ));
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("✅ Producto agregado al carrito")),
+                  const SnackBar(content: Text("Producto agregado al carrito")),
                 );
               },
               icon: const Icon(Icons.shopping_cart_checkout),
               label: const Text("Agregar al carrito") ,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 11, 11, 11),
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),

@@ -1,19 +1,20 @@
+
 import 'package:flutter/material.dart';
-import 'home.dart'; // ✅ Importado correctamente
+import 'home.dart'; 
 
 class SelectTableScreen extends StatelessWidget {
   final bool isLogin;
 
-  const SelectTableScreen({super.key, required this.isLogin}); // ✅ Recibe isLogin
+  const SelectTableScreen({super.key, required this.isLogin});
 
   @override
   Widget build(BuildContext context) {
-    final List<int> mesas = List.generate(11, (index) => index + 1); // Mesas 1 a 11
+    final List<int> mesas = List.generate(11, (index) => index + 1);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Selecciona tu mesa'),
-        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+        backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.white,
       body: Padding(
@@ -26,8 +27,6 @@ class SelectTableScreen extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            
-            // Grid de mesas
             Expanded(
               child: GridView.count(
                 crossAxisCount: 3,
@@ -44,10 +43,7 @@ class SelectTableScreen extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => HomeScreen(
-                            isLogin: isLogin,
-                            mesa: mesa, // ✅ Envía la mesa seleccionada
-                          ),
+                          builder: (_) => HomeScreen(isLogin: isLogin, mesa: mesa),
                         ),
                       );
                     },
@@ -59,19 +55,13 @@ class SelectTableScreen extends StatelessWidget {
                 }).toList(),
               ),
             ),
-
             const SizedBox(height: 10),
-
-            // Botón Delivery
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => HomeScreen(
-                      isLogin: isLogin,
-                      mesa: 0, // ✅ Delivery = mesa 0
-                    ),
+                    builder: (_) => HomeScreen(isLogin: isLogin, mesa: 0),
                   ),
                 );
               },
@@ -81,10 +71,7 @@ class SelectTableScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               ),
               icon: const Icon(Icons.delivery_dining),
-              label: const Text(
-                'Quiero Delivery',
-                style: TextStyle(fontSize: 16),
-              ),
+              label: const Text('Quiero Delivery', style: TextStyle(fontSize: 16)),
             ),
             const SizedBox(height: 20),
           ],

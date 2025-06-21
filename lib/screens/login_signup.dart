@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'select_table.dart'; // ✅ Corregido: vamos a select_table.dart, no directo al home
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'select_table.dart';
+import '../utils/globals.dart';
 
 class LoginSignUpScreen extends StatefulWidget {
   const LoginSignUpScreen({super.key});
@@ -11,6 +15,79 @@ class LoginSignUpScreen extends StatefulWidget {
 class _LoginSignUpScreenState extends State<LoginSignUpScreen> {
   bool isLogin = true;
 
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  Future<void> handleAuth() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final firstName = firstNameController.text.trim();
+    final lastName = lastNameController.text.trim();
+
+    if (email.isEmpty || password.isEmpty || (!isLogin && (firstName.isEmpty || lastName.isEmpty))) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Por favor llena todos los campos")),
+      );
+      return;
+    }
+
+    final url = isLogin
+        ? Uri.parse("http://192.168.0.5:3001/api/auth/login")
+        : Uri.parse("http://192.168.0.5:3001/api/auth/createUser");
+
+    final body = isLogin
+        ? {
+            "email": email,
+            "password": password,
+          }
+        : {
+            "firstName": firstName,
+            "lastName": lastName,
+            "email": email,
+            "password": password,
+            "status": true,
+            "dob": "2000-01-01",
+            "profile_picture": "default.jpg",
+            "roleId": 3
+          };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(body),
+      );
+
+      final resData = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final userData = resData['user'] ?? resData;
+
+        usuarioGlobalId = userData['id'];
+        usuarioGlobalRoleId = userData['roleId'];
+        usuarioGlobalCorreo = userData['email'];
+        usuarioGlobalNombre = "${userData['firstName']} ${userData['lastName']}";
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SelectTableScreen(isLogin: isLogin),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(resData["message"] ?? "Error en autenticación")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error de conexión con el servidor")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,13 +97,13 @@ class _LoginSignUpScreenState extends State<LoginSignUpScreen> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/fondo_login.jpg'),
+                image: AssetImage('assets/fondo_login.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           Center(
-            child: SingleChildScrollView( // ✅ Corregido: scroll para evitar desbordes
+            child: SingleChildScrollView(
               child: Container(
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 40),
@@ -38,7 +115,6 @@ class _LoginSignUpScreenState extends State<LoginSignUpScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Tabs Login / Sign Up
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -89,17 +165,27 @@ class _LoginSignUpScreenState extends State<LoginSignUpScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Column(
                         children: [
-                          TextField(
-                            decoration: const InputDecoration(
-                              hintText: 'E-mail',
+                          if (!isLogin) ...[
+                            TextField(
+                              controller: firstNameController,
+                              decoration: const InputDecoration(hintText: 'First Name'),
                             ),
+                            const SizedBox(height: 10),
+                            TextField(
+                              controller: lastNameController,
+                              decoration: const InputDecoration(hintText: 'Last Name'),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                          TextField(
+                            controller: emailController,
+                            decoration: const InputDecoration(hintText: 'E-mail'),
                           ),
                           const SizedBox(height: 10),
                           TextField(
+                            controller: passwordController,
                             obscureText: true,
-                            decoration: const InputDecoration(
-                              hintText: 'Password',
-                            ),
+                            decoration: const InputDecoration(hintText: 'Password'),
                           ),
                           const SizedBox(height: 30),
                           ElevatedButton(
@@ -111,15 +197,7 @@ class _LoginSignUpScreenState extends State<LoginSignUpScreen> {
                                 borderRadius: BorderRadius.circular(25),
                               ),
                             ),
-                            onPressed: () {
-                              // ✅ Ir a selección de mesa después de login
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => SelectTableScreen(isLogin: isLogin),
-                                ),
-                              );
-                            },
+                            onPressed: handleAuth,
                             child: Text(isLogin ? 'Login' : 'Register'),
                           ),
                           const SizedBox(height: 20),

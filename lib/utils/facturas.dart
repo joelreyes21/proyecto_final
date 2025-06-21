@@ -1,13 +1,9 @@
+import '../models/factura.dart';
 import '../models/producto.dart';
 
 class Facturas {
-  static final List<List<Producto>> _facturas = [];
+  static final List<Factura> _lista = [];
 
-  static void agregarFactura(List<Producto> productos) {
-    _facturas.add(List.from(productos)); // Guardar copia
-  }
-
-  static List<List<Producto>> obtenerFacturas() {
-    return _facturas;
-  }
+  static void agregar(Factura f) => _lista.add(f);
+  static List<Factura> obtenerTodas() => List.unmodifiable(_lista);
 }
