@@ -27,7 +27,7 @@ class _GestionUsuariosScreenState extends State<GestionUsuariosScreen> {
 
   Future<void> fetchUsuarios() async {
     try {
-final response = await http.get(Uri.parse('http://192.168.0.5:3001/api/auth/users'));
+final response = await http.get(Uri.parse('http://192.168.0.8:3000/api/auth/users'));
       if (response.statusCode == 200) {
         setState(() {
           usuarios = json.decode(response.body);
@@ -42,7 +42,7 @@ final response = await http.get(Uri.parse('http://192.168.0.5:3001/api/auth/user
 
   Future<void> eliminarUsuario(int id) async {
   try {
-    final response = await http.delete(Uri.parse('http://192.168.0.5:3001/api/auth/deleteUser/$id'));
+    final response = await http.delete(Uri.parse('http://192.168.0.8:3000/api/auth/deleteUser/$id'));
     if (response.statusCode == 200) {
       setState(() {
         usuarios.removeWhere((user) => user['id'] == id);
@@ -60,7 +60,7 @@ final response = await http.get(Uri.parse('http://192.168.0.5:3001/api/auth/user
   Future<void> cambiarRol(int userId, int nuevoRol) async {
     try {
       final response = await http.put(
-        Uri.parse('http://192.168.0.5:3001/api/auth/updateRole/$userId'),
+        Uri.parse('http://192.168.0.8:3000/api/auth/updateRole/$userId'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({"roleId": nuevoRol}),
       );

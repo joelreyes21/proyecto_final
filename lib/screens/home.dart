@@ -4,12 +4,12 @@ import 'product_details.dart';
 import 'cart_screen.dart';
 import 'profile_screen.dart';
 import 'facturas_screen.dart';
-import '../utils/globals.dart';
+import '../utils/globals.dart' as globals;
 import 'login_signup.dart';
-import '../models/producto.dart';
-import '../utils/carrito.dart';
 import 'gestion_producto.dart';
 import 'staff_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   final bool isLogin;
@@ -25,76 +25,45 @@ class _HomeScreenState extends State<HomeScreen> {
   String selectedCategory = 'All';
   String searchTerm = '';
   int _selectedIndex = 0;
-
-  final List<Map<String, dynamic>> productos = [
-    {
-      'nombre': 'Expresso macchiato',
-      'precio': '\$3.70',
-      'imagen': 'assets/espresso.png',
-      'descripcion': 'Un espresso fuerte con un toque de leche espumada.',
-      'categoria': 'Hot Drinks',
-    },
-    {
-      'nombre': 'Té chai',
-      'precio': '\$6.20',
-      'imagen': 'assets/te.png',
-      'descripcion': 'Té con especias y leche, ideal para tardes frías.',
-      'categoria': 'Hot Drinks',
-    },
-    {
-      'nombre': 'Granita de café',
-      'precio': '\$4.50',
-      'imagen': 'assets/granita.png',
-      'descripcion': 'Café helado con textura granulada, refrescante.',
-      'categoria': 'Cold Drinks',
-    },
-    {
-      'nombre': 'Tiramisu',
-      'precio': '\$4.50',
-      'imagen': 'assets/tiramisu.png',
-      'descripcion': 'Postre italiano con café y mascarpone.',
-      'categoria': 'Pastries',
-    },
-    {
-      'nombre': 'Sandwich',
-      'precio': '\$4.50',
-      'imagen': 'assets/sandwich.png',
-      'descripcion': 'Sándwich clásico con ingredientes frescos.',
-      'categoria': 'Sandwiches',
-    },
-    {
-      'nombre': 'Sandwich de queso',
-      'precio': '\$4.50',
-      'imagen': 'assets/sandwich_cheese.png',
-      'descripcion': 'Sándwich relleno de queso derretido.',
-      'categoria': 'Sandwiches',
-    },
-    {
-      'nombre': 'Chocolate lasagna',
-      'precio': '\$4.50',
-      'imagen': 'assets/chocolate_lasagna.png',
-      'descripcion': 'Postre de chocolate en capas tipo lasagna.',
-      'categoria': 'Pastries',
-    },
-    {
-      'nombre': 'Strawberry shortcake',
-      'precio': '\$4.50',
-      'imagen': 'assets/strawberryshortcake.png',
-      'descripcion': 'Pastel suave con crema y fresas frescas.',
-      'categoria': 'Pastries',
-    },
-  ];
-
+  List<Map<String, dynamic>> productosGlobales = [];
   final List<Widget> _screens = [];
 
   @override
   void initState() {
     super.initState();
-    _screens.addAll([
-      _buildHomeBody(),
-      const StaffScreen(),
-      const PerfilScreen(),
-    ]);
+    fetchProductos();
+    _screens.add(_buildHomeBody());
+    if (globals.usuarioGlobalRoleId == 1 || globals.usuarioGlobalRoleId == 2) {
+      _screens.add(const StaffScreen());
+    }
+    _screens.add(const PerfilScreen());
+  }
+
+  Future<void> fetchProductos() async {
+    final url = Uri.parse('http://192.168.0.8:3000/api/productos');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          productosGlobales = data.map<Map<String, dynamic>>((p) => {
+            'nombre': p['nombre'],
+            'descripcion': p['descripcion'],
+            'precio': "\$${p['precio']}",
+            'imagen': 'assets/default.png',
+            'categoria': p['categoria']?['nombre'] ?? 'Sin categoría',
+          }).toList();
+        });
+      }
+    } catch (e) {
+      print('Error al obtener productos: $e');
+    }
+  }
+
+  void _agregarProducto(Map<String, dynamic> producto) {
+    setState(() {
+      productosGlobales.add(producto);
+    });
   }
 
   void _onItemTapped(int index) {
@@ -102,11 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHomeBody() {
-    final productosFiltrados = productos
-        .where((producto) =>
-            (selectedCategory == 'All' || producto['categoria'] == selectedCategory) &&
-            producto['nombre'].toLowerCase().contains(searchTerm.toLowerCase()))
-        .toList();
+    final productosFiltrados = productosGlobales.where((producto) =>
+      (selectedCategory == 'All' || producto['categoria'] == selectedCategory) &&
+      producto['nombre'].toLowerCase().contains(searchTerm.toLowerCase())).toList();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -172,61 +139,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                         child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
+                          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(20)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.asset(
-                                      producto['imagen'],
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    producto['nombre'],
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    producto['precio'],
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: IconButton(
-                                  icon: const Icon(Icons.add_shopping_cart, size: 20),
-                                  onPressed: () {
-                                    Carrito.agregar(
-                                      Producto(
-                                        nombre: producto['nombre'],
-                                        precio: producto['precio'],
-                                        imagen: producto['imagen'],
-                                        descripcion: producto['descripcion'],
-                                      ),
-                                    );
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("\u{1F6D2} Producto agregado al carrito")),
-                                    );
-                                  },
-                                ),
-                              ),
+                              Icon(Icons.local_cafe, size: 50),
+                              const SizedBox(height: 10),
+                              Text(producto['nombre'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Text(producto['precio']),
                             ],
                           ),
                         ),
@@ -239,118 +160,70 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Drawer _buildDrawer() {
+    return Drawer(
+      child: ListView(padding: EdgeInsets.zero, children: [
+        DrawerHeader(decoration: const BoxDecoration(color: Colors.black), child: const Center(child: Text('Bienvenido', style: TextStyle(color: Colors.white)))),
+        ListTile(leading: const Icon(Icons.person), title: const Text('Perfil'), onTap: () => _onItemTapped(globals.usuarioGlobalRoleId == 1 || globals.usuarioGlobalRoleId == 2 ? 2 : 1)),
+        if (globals.usuarioGlobalRoleId == 1 || globals.usuarioGlobalRoleId == 2)
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Gestión de productos'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => GestionProductosScreen(
+                    onProductoAgregado: (nuevoProducto) {
+                      if (nuevoProducto != null) {
+                        _agregarProducto(nuevoProducto);
+                      }
+                    },
+                  ),
+                ),
+              ).then((resultado) {
+                if (resultado == true) {
+                  fetchProductos();
+                }
+              });
+            },
+          ),
+        ListTile(leading: const Icon(Icons.receipt_long), title: const Text('Facturas'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FacturasScreen()))),
+        if (globals.usuarioGlobalRoleId == 1 || globals.usuarioGlobalRoleId == 2)
+          ListTile(leading: const Icon(Icons.local_shipping), title: const Text('Órdenes activas'), onTap: () {}),
+        ListTile(leading: const Icon(Icons.payment), title: const Text('Métodos de pago'), onTap: () {}),
+        if (globals.usuarioGlobalRoleId == 1)
+          ListTile(leading: const Icon(Icons.group), title: const Text('Gestión de usuarios'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GestionUsuariosScreen()))),
+        ListTile(leading: const Icon(Icons.star), title: const Text('Favoritos'), onTap: () {}),
+        const Divider(),
+        ListTile(leading: const Icon(Icons.logout, color: Colors.red), title: const Text('Cerrar sesión', style: TextStyle(color: Colors.red)), onTap: () {
+          globals.usuarioGlobalId = null;
+          globals.usuarioGlobalRoleId = null;
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const LoginSignUpScreen()), (route) => false);
+        }),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       drawer: _buildDrawer(),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart, color: Colors.black),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
-            },
-          ),
-        ],
-      ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
+      appBar: AppBar(backgroundColor: Colors.white, elevation: 0, iconTheme: const IconThemeData(color: Colors.black), actions: [
+        IconButton(icon: const Icon(Icons.shopping_cart, color: Colors.black), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()))),
+      ]),
+      body: IndexedStack(index: _selectedIndex, children: _screens),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.engineering), label: 'Staff'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
-      ),
-    );
-  }
-
-  Drawer _buildDrawer() {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(color: Color.fromARGB(255, 0, 0, 0)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                CircleAvatar(radius: 30, backgroundColor: Colors.white),
-                SizedBox(height: 10),
-                Text('Bienvenido', style: TextStyle(color: Colors.white)),
-              ],
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Perfil'),
-            onTap: () => _onItemTapped(2),
-          ),
-          if (usuarioGlobalRoleId == 1 || usuarioGlobalRoleId == 2)
-            ListTile(
-              leading: const Icon(Icons.settings_suggest),
-              title: const Text('Gestión de productos'),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const GestionProductosScreen()));
-              },
-            ),
-          ListTile(
-            leading: const Icon(Icons.receipt_long),
-            title: const Text('Facturas'),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const FacturasScreen()));
-            },
-          ),
-          if (usuarioGlobalRoleId == 1 || usuarioGlobalRoleId == 2)
-            ListTile(
-              leading: const Icon(Icons.receipt_long),
-              title: const Text('Órdenes activas'),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const FacturasScreen()));
-              },
-            ),
-          ListTile(
-            leading: const Icon(Icons.payment),
-            title: const Text('Métodos de pago'),
-            onTap: () {},
-          ),
-          if (usuarioGlobalRoleId == 1 || usuarioGlobalRoleId == 2)
-            ListTile(
-              leading: const Icon(Icons.group),
-              title: const Text('Gestión de usuarios'),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const GestionUsuariosScreen()));
-              },
-            ),
-          ListTile(
-            leading: const Icon(Icons.star),
-            title: const Text('Favoritos'),
-            onTap: () {},
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
-            onTap: () {
-              usuarioGlobalId = null;
-              usuarioGlobalRoleId = null;
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginSignUpScreen()),
-                (route) => false,
-              );
-            },
-          ),
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          if (globals.usuarioGlobalRoleId == 1 || globals.usuarioGlobalRoleId == 2)
+            const BottomNavigationBarItem(icon: Icon(Icons.engineering), label: 'Staff'),
+          const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),
     );

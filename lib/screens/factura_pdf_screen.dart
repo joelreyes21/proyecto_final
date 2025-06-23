@@ -33,7 +33,7 @@ class _FacturaPdfScreenState extends State<FacturaPdfScreen> {
 
   Future<List<Producto>> _cargarProductosFactura() async {
     final uri = Uri.parse(
-        'http://192.168.0.5:3001/api/facturas/${widget.facturaId}/detalles');
+        'http://192.168.0.8:3000/api/facturas/${widget.facturaId}/detalles');
 
     final res = await http.get(uri);
     if (res.statusCode != 200) {

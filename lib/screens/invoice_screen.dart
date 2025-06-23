@@ -20,7 +20,7 @@ class InvoiceScreen extends StatelessWidget {
   });
 
   Future<void> _guardarFactura(BuildContext context) async {
-        const String baseUrl = 'http://192.168.0.5:3001'; // ✅
+        const String baseUrl = 'http://192.168.0.8:3000'; // ✅
         final Uri uri = Uri.parse('$baseUrl/api/facturas/crear');
 
     // Prepara los productos que se enviarán

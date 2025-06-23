@@ -22,7 +22,7 @@ class _FacturasScreenState extends State<FacturasScreen> {
   }
 
   Future<List<Factura>> _fetchFacturas() async {
-    final baseUrl = 'http://192.168.0.5:3001';
+    final baseUrl = 'http://192.168.0.8:3000';
     final uri = Uri.parse('$baseUrl/api/facturas/usuario/$usuarioGlobalId');
 
     final res = await http.get(uri);

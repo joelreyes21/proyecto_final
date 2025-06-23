@@ -34,8 +34,8 @@ class _LoginSignUpScreenState extends State<LoginSignUpScreen> {
     }
 
     final url = isLogin
-        ? Uri.parse("http://192.168.0.5:3001/api/auth/login")
-        : Uri.parse("http://192.168.0.5:3001/api/auth/createUser");
+        ? Uri.parse("http://192.168.0.8:3000/api/auth/login")
+        : Uri.parse("http://192.168.0.8:3000/api/auth/createUser");
 
     final body = isLogin
         ? {
